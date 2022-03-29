@@ -1,0 +1,58 @@
+//Code fragement
+//
+//public class Main{
+//    do();
+//
+//    public void do(){
+//        new A().foo();
+//    }
+//}
+//
+//public class A{
+//    public void foo(){
+//        bar(); 
+//    }
+//    public void bar(){
+//        log(nextInt(););
+//    }
+//}
+
+.type method <: symbol
+.type type <: symbol
+.type class <: symbol
+
+//input
+.decl bom(b:method)
+.decl method(m:method)
+.decl f2R(a:method, b:method)
+.decl invoke(a:method, m:method)
+.decl returnT(m:method, t:type)
+
+//fact
+bom("nextInt()").
+method("nextInt()").
+method("do()").
+method("foo()").
+method("bar()").
+method("log()").
+class("Main").
+class("A").
+invoke("do()", "foo()").
+invoke("foo()", "bar()").
+invoke("bar()", "log()").
+invoke("log()", "nextInt()").
+
+//analysis
+.decl source(a:method) output
+source(a) :- method(a), bom(y), f2R(y, s).
+source(a) :- method(a), match(bom(y), s).
+
+.decl flow(a:method, b:method)
+.output flow
+flow(X,Y) :- invoke(X,Y), match(source(a), Y).
+flow(Z,Y) :- flow(X,Y), flow(Z,X).
+
+.decl typeChange(a:method, b:method)
+.output typeChange
+typeChange(X,Y) :- returnT(X, t1), returnT(Y, t2), flow(X,Y), t1 != t2.
+
