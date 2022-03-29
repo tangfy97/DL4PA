@@ -1,0 +1,53 @@
+// example - data accumulation
+public class A{
+    do();
+    public void do{
+        println(foo());
+    }
+    public String foo() {
+        String s = "";
+        while (true){
+            s = s + next(); //ignored recursion from one source
+            //next four lines only has one object ls but under multiple sources
+            List<String> ls = new List<String>();
+            ls = ls + next(); //source1
+            ls = ls + readFile(); //source2
+            ls = ls + String.valueOf(nextInt()); //source3 merged with source1 and source2 into one object
+            //next five lines have multiple objects and more than two sources
+            int i = 0; //object1
+            DateTime dt = getTime(); //object2 from source1
+            s = s + next(); //object3 from source2
+            s = s + i + dt; //three objects merged
+            i++;
+        }
+        return s;
+    }
+}
+
+
+.number_type int
+.symbol_type bool
+.symbol_type string
+.symbol_type char
+.type primitive = int|bool|string|char //primitive java types
+
+.symbol_type real_class
+.symbol_type list
+.symbol_type interface
+.symbol_type enum
+.type class = real_class|list|interface //reference java types (class)
+
+.type value <: symbol // a value
+.type arg = [v:value, a:arg] // a recursive record of arguments
+.type external <: symbol //external data type, e.g. a crptoObject
+.type type = external|primitive //data type: either a primitive or an external object
+
+.decl bom(b:method)
+.decl method(m:method)
+.decl invoke(m:method,n:method,arg:arg) //m(n(arg))
+.decl return(m:method,v:value) //m(return(v))
+.decl assign(m:method,v:value,n:method) //m(v=n())
+.decl valueT(v:value,t:type) //v has type t
+
+
+

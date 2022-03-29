@@ -1,0 +1,45 @@
+// example - data type change
+// call flow:
+// source() -> encode() -> encrypt() -> decode() -> decrypt() -> foo() -> log() -> do()
+public class A{
+    do();
+    public void do(){
+        log(foo());
+    }
+    public crptoObject encode(String s){
+        return encrypt(s); //type change
+    }
+    public String decrypt(crptoObject co){
+        return decrypt(co); //type change
+    }
+    public String foo(){
+        String s = source();
+        crptoObject co = encode(s);
+        return decode(co);
+    }
+}
+
+
+.number_type int
+.symbol_type bool
+.symbol_type string
+.symbol_type char
+.type primitive = int|bool|string|char //primitive java types
+
+.symbol_type real_class
+.symbol_type list
+.symbol_type interface
+.symbol_type enum
+.type class = real_class|list|interface //reference java types (class)
+
+.type value <: symbol // a value
+.type arg = [v:value, a:arg] // a recursive record of arguments
+.type external <: symbol //external data type, e.g. a crptoObject
+.type type = external|primitive //data type: either a primitive or an external object
+
+.decl bom(b:method)
+.decl method(m:method)
+.decl invoke(m:method,n:method,arg:arg) //m(n(arg))
+.decl return(m:method,v:value) //m(return(v))
+.decl assign(m:method,v:value,n:method) //m(v=n())
+.decl valueT(v:value,t:type) //v has type t
