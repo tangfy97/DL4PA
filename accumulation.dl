@@ -13,12 +13,6 @@ public class A{
             ls = ls + next(); //source1
             ls = ls + readFile(); //source2
             ls = ls + String.valueOf(nextInt()); //source3 merged with source1 and source2 into one object
-            //next five lines have multiple objects and more than two sources
-            int i = 0; //object1
-            DateTime dt = getTime(); //object2 from source1
-            s = s + next(); //object3 from source2
-            s = s + i + dt; //three objects merged
-            i++;
         }
         return s;
     }
@@ -31,11 +25,11 @@ public class A{
 .symbol_type char
 .type primitive = int|bool|string|char //primitive java types
 
-.symbol_type real_class
+.symbol_type class
 .symbol_type list
 .symbol_type interface
 .symbol_type enum
-.type class = real_class|list|interface //reference java types (class)
+.type reference = class|list|interface //reference java types (class)
 
 .type value <: symbol // a value
 .type arg = [v:value, a:arg] // a recursive record of arguments
