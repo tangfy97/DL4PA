@@ -4,11 +4,11 @@
 //    do();
 //    public void do(){
 //        log(toy());
-//        log(B.foo());
 //        log(B.boo());
 //    }
-//    public int toy(){
-//        return 5;
+//    public String toy(){
+//        String s = B.boo();
+//        return s;
 //    }
 //}
 
