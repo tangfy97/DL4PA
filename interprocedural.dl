@@ -4,7 +4,8 @@
 //    do();
 //    public void do(){
 //        log(toy());
-//        log(B.boo());
+//        log(B.foo());
+//        log(read());
 //    }
 //    public String toy(){
 //        String s = B.boo();
@@ -40,15 +41,17 @@
 method("do()", "A").
 method("toy()", "A").
 method("log()", "A").
+method("read()", "A").
 method("foo()", "B").
 method("boo()", "B").
 method("source()", "B").
 
 source("source()").
+source("read()").
 
 CG("log()", "do()").
 CG("foo()", "log()").
-CG("boo()", "log()").
+CG("boo()", "toy()").
 CG("toy()", "log()").
 CG("source()", "foo()").
 
@@ -59,12 +62,14 @@ RtnStm("r1", "foo()").
 RtnStm("r2", "boo()").
 
 //A class
-AsgStm("k1", "toy()").
+//AsgStm("k1", "toy()").
 AsgStm("k2", "foo()").
-AsgStm("k3", "boo()").
+AsgStm("k1", "boo()").
+
+RtnStm("k1", "toy()").
+
 IvkStm("k1", "log()").
 IvkStm("k2", "log()").
-IvkStm("k3", "log()").
 IvkStm("", "toy()").
 IvkStm("", "boo()").
 IvkStm("", "foo()").
@@ -96,8 +101,7 @@ Out(m, x) :- RtnStm(x, m). //x=m()
 .output Out
 
 .decl flow(m1: Mtd, m2: Mtd, x: Var)
-flow(m1, m2, x) :- CG(m1, m2), Out(m1, x), In(m2, x), !isGlobal(m1, m2). //m2(x=m1), m1 and m2 are local method
-flow(m1, m2, y) :- CG(m1, m2), Out(m1, y), In(m2, y), isGlobal(m1, m2). //m2(x=m1), m1 and m2 are global methods
+flow(m1, m2, x) :- CG(m1, m2), Out(m1, x), In(m2, x). //m2(x=m1)
 flow(m1, m2, x) :- flow(m1, m3, x), flow(m3, m2, x).
 .output flow
 
