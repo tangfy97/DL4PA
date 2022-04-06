@@ -4,7 +4,8 @@
 //    do();
 //    public void do(){
 //        log(toy());
-//        log(B.foo(), B.boo());
+//        log(B.foo());
+//        log(B.boo());
 //    }
 //    public int toy(){
 //        return 5;
@@ -28,11 +29,12 @@
 .type Typ <: symbol // a Type
 
 /*input*/
-.decl method(m: Mtd, c: Cls); //represents method m is declared in class c
-.decl CG(m1: Mtd, m2: Mtd); //represents an edge from m1 to m2 in a call graph
-.decl AsgStm(x: Var, n: Mtd); //represents assignment x=n()
-.decl IvkStm(x: Var, n: Mtd); //represents invocation n(x)
-.decl RtnStm(x: Var, n: Mtd); //represents n{return x}
+.decl method(m: Mtd, c: Cls) //represents method m is declared in class c
+.decl CG(m1: Mtd, m2: Mtd) //represents an edge from m1 to m2 in a call graph
+.decl AsgStm(x: Var, n: Mtd) //represents assignment x=n()
+.decl IvkStm(x: Var, n: Mtd) //represents invocation n(x)
+.decl RtnStm(x: Var, n: Mtd) //represents n{return x}
+.decl source(m: Mtd)
 
 /*facts*/
 method("do()", "A").
@@ -42,9 +44,11 @@ method("foo()", "B").
 method("boo()", "B").
 method("source()", "B").
 
+source("source()").
+
+CG("log()", "do()").
 CG("foo()", "log()").
 CG("boo()", "log()").
-CG("log()", "do()").
 CG("toy()", "log()").
 CG("source()", "foo()").
 
@@ -52,31 +56,51 @@ CG("source()", "foo()").
 IvkStm("", "source()").
 AsgStm("r1", "source()").
 RtnStm("r1", "foo()").
+RtnStm("r2", "boo()").
 
 //A class
+AsgStm("k1", "toy()").
+AsgStm("k2", "foo()").
+AsgStm("k3", "boo()").
+IvkStm("k1", "log()").
+IvkStm("k2", "log()").
+IvkStm("k3", "log()").
 IvkStm("", "toy()").
-IvkStm("r3", "log()").
-AsgStm("r3", "foo()").
+IvkStm("", "boo()").
+IvkStm("", "foo()").
 
 
 
 
-
-.decl isGlobal(m1: Mtd, m2: Mtd); //represents m1 is a global method of m2
+.decl isGlobal(m1: Mtd, m2: Mtd) //represents m1 is a global method of m2
 isGlobal(m1, m2) :- method(m1, c1), method(m2, c2), !c1=c2.
 
-.decl InvokeGlobal(m1: Mtd, m2: Mtd);
+.decl isSource(m: Mtd)
+isSource(m) :- method(m, c), source(m).
+
+.decl InvokeGlobal(m1: Mtd, m2: Mtd)
 InvokeGlobal(m1, m2) :- CG(m1, m2), isGlobal(m1, m2).
+.output InvokeGlobal
 
 .decl In(m: Mtd, x: Var) 
 /* incoming dataflow to m2 from m1 with value x*/
-In(m2, x) :− CG(m1, m2), Out(m1, x). //m2(x)
-In(m2, x) :− IvkStm(arg, m2). //initialisation of m2: m2(arg)
+In(m2, x) :- CG(m1, m2), Out(m1, x). //m2(x=m1)
+In(m2, x) :- IvkStm(x, m2). //initialisation of m2: m2(x)
 In(m2, x) :- CG(m1, m2), InvokeGlobal(m1, m2), Out(m1, x). //when m1 and m2 are declared by difference class, we unify the input value to m2 and output value of m1
 .output In
 
 .decl Out(m: Mtd, x: Var) 
 /* outgoing dataflow */
-Out(m, x) :− AsgStm(x, m), IvkStm(y, m), In(m, y). //x=m(y)
-Out(m, x) :− RtnStm(x, m). //x=m()
+Out(m, x) :- AsgStm(x, m), IvkStm(y, m), In(m, y). //x=m(y)
+Out(m, x) :- RtnStm(x, m). //x=m()
 .output Out
+
+.decl flow(m1: Mtd, m2: Mtd, x: Var)
+flow(m1, m2, x) :- CG(m1, m2), Out(m1, x), In(m2, x), !isGlobal(m1, m2). //m2(x=m1), m1 and m2 are local method
+flow(m1, m2, y) :- CG(m1, m2), Out(m1, y), In(m2, y), isGlobal(m1, m2). //m2(x=m1), m1 and m2 are global methods
+flow(m1, m2, x) :- flow(m1, m3, x), flow(m3, m2, x).
+.output flow
+
+.decl SourceGlobal(m1: Mtd, m2: Mtd, x: Var)
+SourceGlobal(m1, m2, x) :- flow(m1, m2, x), isSource(m1), isGlobal(m1, m2).
+.output SourceGlobal
