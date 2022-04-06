@@ -3,8 +3,11 @@
 //public class A{
 //    do();
 //    public void do(){
-//        toy();
-//        log(B.foo());
+//        log(toy());
+//        log(B.foo(), B.boo());
+//    }
+//    public int toy(){
+//        return 5;
 //    }
 //}
 
@@ -12,6 +15,9 @@
 //    public static String foo(){
 //        String k = source();
 //        return k;
+//    }
+//    public static String boo(){
+//        return "boo";
 //    }
 //}
 
@@ -33,11 +39,13 @@ method("do()", "A").
 method("toy()", "A").
 method("log()", "A").
 method("foo()", "B").
+method("boo()", "B").
 method("source()", "B").
 
 CG("foo()", "log()").
+CG("boo()", "log()").
 CG("log()", "do()").
-CG("toy()", "do()").
+CG("toy()", "log()").
 CG("source()", "foo()").
 
 //B class
