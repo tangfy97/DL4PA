@@ -1,4 +1,4 @@
 # DL4PA
 
-Enter some useful information.
+Datalog implementation of finding privacy-related flows in programs.
 
