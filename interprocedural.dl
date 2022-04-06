@@ -50,6 +50,7 @@ source("source()").
 source("read()").
 
 CG("log()", "do()").
+CG("read()", "log()").
 CG("foo()", "log()").
 CG("boo()", "toy()").
 CG("toy()", "log()").
@@ -62,17 +63,20 @@ RtnStm("r1", "foo()").
 RtnStm("r2", "boo()").
 
 //A class
-//AsgStm("k1", "toy()").
 AsgStm("k2", "foo()").
 AsgStm("k1", "boo()").
+AsgStm("k3", "read()").
 
 RtnStm("k1", "toy()").
 
 IvkStm("k1", "log()").
 IvkStm("k2", "log()").
+IvkStm("k3", "log()").
+
 IvkStm("", "toy()").
 IvkStm("", "boo()").
 IvkStm("", "foo()").
+IvkStm("", "read()").
 
 
 
@@ -105,6 +109,10 @@ flow(m1, m2, x) :- CG(m1, m2), Out(m1, x), In(m2, x). //m2(x=m1)
 flow(m1, m2, x) :- flow(m1, m3, x), flow(m3, m2, x).
 .output flow
 
-.decl SourceGlobal(m1: Mtd, m2: Mtd, x: Var)
-SourceGlobal(m1, m2, x) :- flow(m1, m2, x), isSource(m1), isGlobal(m1, m2).
-.output SourceGlobal
+.decl sourceFlow(m1: Mtd, m2: Mtd, x: Var)
+sourceFlow(m1, m2, x) :- flow(m1, m2, x), isSource(m1).
+.output sourceFlow
+
+.decl sourceGlobal(m1: Mtd, m2: Mtd, x: Var)
+sourceGlobal(m1, m2, x) :- flow(m1, m2, x), isSource(m1), isGlobal(m1, m2).
+.output sourceGlobal
